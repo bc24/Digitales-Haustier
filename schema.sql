@@ -130,3 +130,23 @@ SELECT LEAST(a.id, b.id), GREATEST(a.id, b.id), r.v FROM (
   SELECT 'Drache','Katze',-1 UNION ALL SELECT 'Drache','Hund',-1 UNION ALL SELECT 'Drache','Schildkröte',1 UNION ALL
   SELECT 'Papagei','Pinguin',1 UNION ALL SELECT 'Papagei','Hamster',1
 ) r JOIN species a ON a.name = r.x JOIN species b ON b.name = r.y;
+
+CREATE TABLE IF NOT EXISTS throttle (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  kind VARCHAR(20) NOT NULL,
+  ident VARCHAR(120) NOT NULL,
+  created_at DATETIME NOT NULL,
+  INDEX (kind, ident, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used TINYINT(1) NOT NULL DEFAULT 0,
+  UNIQUE KEY (token_hash),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO settings (k, v) VALUES ('mail_from', ''), ('site_url', '');

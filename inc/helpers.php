@@ -48,3 +48,28 @@ function time_ago(string $dt): string {
     return 'vor ' . floor($d / 86400) . ' Tagen';
 }
 function clamp(float $v, float $min = 0, float $max = 100): float { return max($min, min($max, $v)); }
+
+function client_ip(): string { return substr($_SERVER['REMOTE_ADDR'] ?? 'unknown', 0, 45); }
+
+// Einfache Bremse gegen Brute-Force und Spam
+function throttle_count(string $kind, string $ident, int $minutes): int {
+    return (int)val('SELECT COUNT(*) FROM throttle WHERE kind=? AND ident=? AND created_at > (NOW() - INTERVAL ? MINUTE)', [$kind, mb_strtolower($ident), $minutes]);
+}
+function throttle_hit(string $kind, string $ident): void {
+    q('INSERT INTO throttle (kind, ident, created_at) VALUES (?,?,NOW())', [$kind, mb_strtolower($ident)]);
+    if (random_int(1, 50) === 1) q('DELETE FROM throttle WHERE created_at < (NOW() - INTERVAL 2 DAY)');
+}
+
+function site_base_url(): string {
+    $u = rtrim(setting('site_url', ''), '/');
+    if ($u !== '') return $u;
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    if (!preg_match('/^[A-Za-z0-9.\-]+(:\d+)?$/', $host)) $host = 'localhost';
+    return (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $host . BASE;
+}
+function send_mail(string $to, string $subject, string $body): bool {
+    $from = setting('mail_from', '');
+    if ($from === '') $from = 'noreply@' . preg_replace('/:\d+$/', '', parse_url(site_base_url(), PHP_URL_HOST) ?: 'localhost');
+    $headers = "From: " . setting('site_name', 'Digitales Haustier') . " <$from>\r\nContent-Type: text/plain; charset=UTF-8\r\nMIME-Version: 1.0";
+    return @mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+}

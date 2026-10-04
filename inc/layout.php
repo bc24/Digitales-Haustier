@@ -26,7 +26,7 @@ function page_header(string $title, string $active = ''): void {
         <a class="<?= $active === 'users' ? 'on' : '' ?>" href="<?= e(url('users.php')) ?>">Entdecken</a>
         <a class="<?= $active === 'me' ? 'on' : '' ?>" href="<?= e(url('profile.php?u=' . urlencode($u['username']))) ?>">Profil</a>
         <?php if ($u['is_admin']): ?><a class="admin-link" href="<?= e(url('admin/index.php')) ?>">Admin</a><?php endif; ?>
-        <a href="<?= e(url('logout.php')) ?>">Abmelden</a>
+        <form method="post" action="<?= e(url('logout.php')) ?>" class="logout"><?= csrf_field() ?><button>Abmelden</button></form>
       <?php else: ?>
         <a href="<?= e(url('users.php')) ?>">Entdecken</a>
         <a href="<?= e(url('login.php')) ?>">Anmelden</a>
