@@ -14,6 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!password_verify($_POST['old'] ?? '', $u['password_hash'])) flash('Aktuelles Passwort falsch.', 'err');
         elseif (strlen($_POST['new'] ?? '') < 8) flash('Neues Passwort: mindestens 8 Zeichen.', 'err');
         else { q('UPDATE users SET password_hash=? WHERE id=?', [password_hash($_POST['new'], PASSWORD_DEFAULT), $u['id']]); flash('Passwort geändert.'); }
+    } elseif (($_POST['do'] ?? '') === 'delete') {
+        if (!password_verify($_POST['pw'] ?? '', $u['password_hash'])) { flash('Passwort falsch. Konto nicht gelöscht.', 'err'); redirect('settings.php'); }
+        if ($u['is_admin'] && (int)val('SELECT COUNT(*) FROM users WHERE is_admin=1') < 2) { flash('Du bist der einzige Admin und kannst dein Konto nicht löschen.', 'err'); redirect('settings.php'); }
+        q('DELETE FROM users WHERE id=?', [$u['id']]);
+        $_SESSION = []; session_destroy(); session_start();
+        flash('Dein Konto und alle zugehörigen Daten wurden gelöscht.');
+        redirect('index.php');
     }
     redirect('settings.php');
 }
@@ -30,4 +37,8 @@ page_header('Einstellungen', 'me');
   <label>Aktuelles Passwort<input type="password" name="old" required></label>
   <label>Neues Passwort<input type="password" name="new" required></label>
   <button class="btn">Ändern</button></form></div>
+<h2>Konto löschen</h2>
+<div class="card"><p class="muted">Löscht dein Konto, dein Profil, deine Tiere und deine Freundschaften endgültig.</p>
+<form method="post" class="row" onsubmit="return confirm('Konto endgültig löschen?')"><?= csrf_field() ?><input type="hidden" name="do" value="delete">
+  <input type="password" name="pw" placeholder="Passwort zur Bestätigung" required class="grow"><button class="btn danger">Konto löschen</button></form></div>
 <?php page_footer();

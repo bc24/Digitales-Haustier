@@ -42,7 +42,8 @@ function page_header(string $title, string $active = ''): void {
 function page_footer(): void {
     ?></main>
 <footer class="foot">
-  <div class="wrap">2026 by. <a href="https://Frank-Panzer.de" target="_blank" rel="noopener">Frank Panzer</a> - Entwickelt von <a href="https://panzerit.de" target="_blank" rel="noopener">Panzer IT</a></div>
+  <div class="wrap">2026 by. <a href="https://Frank-Panzer.de" target="_blank" rel="noopener">Frank Panzer</a> - Entwickelt von <a href="https://panzerit.de" target="_blank" rel="noopener">Panzer IT</a>
+  <div class="legal"><a href="<?= e(url('impressum.php')) ?>">Impressum</a> · <a href="<?= e(url('datenschutz.php')) ?>">Datenschutz</a></div></div>
 </footer>
 </body>
 </html>
