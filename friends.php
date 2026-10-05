@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($do === 'accept' && $existing && $existing['status'] === 'pending' && (int)$existing['addressee_id'] === $me) {
         q("UPDATE friendships SET status='accepted' WHERE id=?", [$existing['id']]);
         log_activity($other, null, $u['username'] . ' hat deine Freundschaftsanfrage angenommen.');
+        check_achievements($me); check_achievements($other);
         flash('Ihr seid jetzt befreundet.');
     } elseif (in_array($do, ['decline', 'remove', 'cancel'], true) && $existing) {
         q('DELETE FROM friendships WHERE id=?', [$existing['id']]);
@@ -23,12 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     redirect($back === 'profile' ? 'profile.php?u=' . urlencode($target['username']) : 'friends.php');
 }
-$incoming = rows("SELECT u.id, u.username, u.display_name, u.avatar FROM friendships f JOIN users u ON u.id=f.requester_id WHERE f.addressee_id=? AND f.status='pending'", [$me]);
-$outgoing = rows("SELECT u.id, u.username, u.display_name, u.avatar FROM friendships f JOIN users u ON u.id=f.addressee_id WHERE f.requester_id=? AND f.status='pending'", [$me]);
-$friends = rows("SELECT u.id, u.username, u.display_name, u.avatar FROM friendships f JOIN users u ON u.id = IF(f.requester_id=?, f.addressee_id, f.requester_id)
+$incoming = rows("SELECT u.id, u.username, u.display_name, u.avatar, u.last_seen FROM friendships f JOIN users u ON u.id=f.requester_id WHERE f.addressee_id=? AND f.status='pending'", [$me]);
+$outgoing = rows("SELECT u.id, u.username, u.display_name, u.avatar, u.last_seen FROM friendships f JOIN users u ON u.id=f.addressee_id WHERE f.requester_id=? AND f.status='pending'", [$me]);
+$friends = rows("SELECT u.id, u.username, u.display_name, u.avatar, u.last_seen FROM friendships f JOIN users u ON u.id = IF(f.requester_id=?, f.addressee_id, f.requester_id)
                  WHERE f.status='accepted' AND (f.requester_id=? OR f.addressee_id=?) AND u.is_banned=0 ORDER BY u.username", [$me, $me, $me]);
 function friend_row(array $f, array $buttons): void { ?>
-  <li class="row"><span class="av-s"><?= e($f['avatar']) ?></span>
+  <li class="row"><span class="av-s"><?= e($f['avatar']) ?></span><?= !empty($f['last_seen']) && time() - strtotime($f['last_seen']) < 300 ? '<i class="online" title="online"></i>' : '' ?>
     <a class="grow" href="<?= e(url('profile.php?u=' . urlencode($f['username']))) ?>"><?= e($f['display_name'] ?: $f['username']) ?> <span class="muted">@<?= e($f['username']) ?></span></a>
     <form method="post" class="row"><?= csrf_field() ?><input type="hidden" name="user" value="<?= (int)$f['id'] ?>">
       <?php foreach ($buttons as $do => $label): ?><button class="btn small <?= $do === 'accept' ? '' : 'ghost' ?>" name="do" value="<?= e($do) ?>"><?= e($label) ?></button><?php endforeach; ?></form></li>

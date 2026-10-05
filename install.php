@@ -20,6 +20,7 @@ if (!$done && $_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach (preg_split('/;\s*\n/', file_get_contents(ROOT . '/schema.sql')) as $stmt) {
                 if (trim($stmt) !== '') $pdo->exec($stmt);
             }
+            $pdo->exec("INSERT INTO settings (k, v) VALUES ('schema_version', '1') ON DUPLICATE KEY UPDATE v = '1'");
             $st = $pdo->prepare('INSERT INTO users (username, email, password_hash, display_name, is_admin, created_at) VALUES (?,?,?,?,1,NOW())');
             $st->execute([$v['admin'], $v['email'], password_hash($apass, PASSWORD_DEFAULT), $v['admin']]);
             $cfg = "<?php\nreturn " . var_export(['host' => $v['host'], 'name' => $v['name'], 'user' => $v['user'], 'pass' => $dbpass], true) . ";\n";

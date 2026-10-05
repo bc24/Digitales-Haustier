@@ -9,8 +9,10 @@ const FOODS = [
 
 function get_pet(int $id): ?array {
     $p = row('SELECT p.*, s.name AS species, s.emoji, s.color, s.temperament, s.favorite_food,
-                     s.food_decay, s.fun_decay, s.clean_decay, s.energy_decay, u.username, u.display_name AS owner_name
-              FROM pets p JOIN species s ON s.id = p.species_id JOIN users u ON u.id = p.user_id WHERE p.id = ?', [$id]);
+                     s.rarity, s.food_decay, s.fun_decay, s.clean_decay, s.energy_decay, u.username, u.display_name AS owner_name,
+                     h.emoji AS hat, r.color AS room_color, r.name AS room_name
+              FROM pets p JOIN species s ON s.id = p.species_id JOIN users u ON u.id = p.user_id
+              LEFT JOIN items h ON h.id = p.hat_id LEFT JOIN items r ON r.id = p.room_id WHERE p.id = ?', [$id]);
     return $p ? apply_decay($p) : null;
 }
 
@@ -37,6 +39,22 @@ function save_pet(array $p): void {
 }
 
 function pet_level(array $p): int { return (int)floor(sqrt($p['xp'] / 10)) + 1; }
+
+// Entwicklungsstufe nach Level: [Name, Skalierung]
+function pet_stage(int $lvl): array {
+    if ($lvl >= 16) return ['Meister', 1.0];
+    if ($lvl >= 9)  return ['Erwachsen', 0.92];
+    if ($lvl >= 4)  return ['Jungtier', 0.78];
+    return ['Baby', 0.62];
+}
+
+// Tier als HTML (Emoji mit Farbvariante, Hut und Entwicklungsstufe)
+function pet_visual(array $p, string $cls = '', bool $stage = true): string {
+    $scale = $stage ? pet_stage(pet_level($p))[1] : 1;
+    $style = 'font-size:' . round($scale, 2) . 'em;' . ((int)$p['hue'] ? 'filter:hue-rotate(' . (int)$p['hue'] . 'deg) drop-shadow(0 8px 8px rgba(0,0,0,.15));' : '');
+    return '<span class="pv ' . e($cls) . '"><span class="pv-body" style="' . $style . '">' . e($p['emoji']) . '</span>'
+         . (!empty($p['hat']) ? '<span class="pv-hat">' . e($p['hat']) . '</span>' : '') . '</span>';
+}
 
 function pet_mood(array $p): array {
     $avg = ($p['food'] + $p['fun'] + $p['clean'] + $p['energy'] + $p['health']) / 5;
@@ -131,6 +149,8 @@ function pet_action(array &$p, string $action, ?string $food = null): array {
     $p['xp'] += 5;
     save_pet($p);
     log_activity((int)$p['user_id'], (int)$p['id'], $msg);
+    track((int)$p['user_id'], $action);
+    care_reward((int)$p['user_id']);
     return [true, $msg];
 }
 
@@ -186,7 +206,12 @@ function playdate(array &$a, array &$b): array {
        ON DUPLICATE KEY UPDATE score = score + VALUES(score), meetings = meetings + 1, last_meeting = NOW()',
       [min($a['id'], $b['id']), max($a['id'], $b['id']), $d]);
     log_activity((int)$a['user_id'], (int)$a['id'], $msg);
-    if ($b['user_id'] !== $a['user_id']) log_activity((int)$b['user_id'], (int)$b['id'], $msg);
+    if ($b['user_id'] !== $a['user_id']) {
+        log_activity((int)$b['user_id'], (int)$b['id'], $msg);
+        award((int)$b['user_id'], 5, 4);
+    }
+    track((int)$a['user_id'], 'playdate');
+    award((int)$a['user_id'], ['great' => 15, 'ok' => 8, 'conflict' => 3][$res], 8);
     return [true, $msg, $res];
 }
 
@@ -201,4 +226,23 @@ function are_friends(int $a, int $b): bool {
 function user_pets(int $uid): array {
     $ids = array_column(rows('SELECT id FROM pets WHERE user_id = ? ORDER BY id', [$uid]), 'id');
     return array_values(array_filter(array_map('get_pet', $ids)));
+}
+
+
+// Item aus dem Rucksack an einem Tier verwenden
+function use_item_on_pet(array &$p, array $item): array {
+    $name = $p['name'];
+    if (!take_item((int)$p['user_id'], (int)$item['id'])) return [false, 'Du besitzt dieses Item nicht (mehr).'];
+    $p['food'] = clamp($p['food'] + $item['food_val']);
+    $p['fun'] = clamp($p['fun'] + $item['fun_val']);
+    $p['clean'] = clamp($p['clean'] + $item['clean_val']);
+    $p['energy'] = clamp($p['energy'] + $item['energy_val']);
+    $p['health'] = clamp($p['health'] + $item['health_val']);
+    $p['affection'] = clamp($p['affection'] + $item['aff_val']);
+    $p['xp'] += 8;
+    save_pet($p);
+    $msg = "$name hat {$item['emoji']} {$item['name']} bekommen.";
+    log_activity((int)$p['user_id'], (int)$p['id'], $msg);
+    award((int)$p['user_id'], 0, 4);
+    return [true, $msg];
 }

@@ -13,6 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'promote': q('UPDATE users SET is_admin=1 WHERE id=?', [$id]); flash('Zum Admin ernannt.'); break;
         case 'demote': q('UPDATE users SET is_admin=0 WHERE id=?', [$id]); flash('Adminrechte entzogen.'); break;
         case 'delete': q('DELETE FROM users WHERE id=?', [$id]); flash('Benutzer samt Tieren gelöscht.'); break;
+        case 'coins':
+            $n = max(-100000, min(100000, (int)($_POST['coins'] ?? 0)));
+            if ($n >= 0) q('UPDATE users SET coins = coins + ? WHERE id=?', [$n, $id]);
+            else q('UPDATE users SET coins = IF(coins > ?, coins - ?, 0) WHERE id=?', [-$n, -$n, $id]);
+            flash('Münzen angepasst.'); break;
         case 'password':
             $pw = $_POST['password'] ?? '';
             if (strlen($pw) < 8) flash('Passwort: mindestens 8 Zeichen.', 'err');
@@ -28,15 +33,16 @@ admin_header('Benutzer', 'users');
 ?>
 <form class="row card" method="get"><input class="grow" name="q" value="<?= e($search) ?>" placeholder="Name oder E-Mail"><button class="btn">Suchen</button></form>
 <div class="card scroll"><table>
-<tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Tiere</th><th>Status</th><th>Aktionen</th></tr>
+<tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Tiere</th><th>Münzen</th><th>Status</th><th>Aktionen</th></tr>
 <?php foreach ($list as $x): ?>
 <tr><td><?= $x['id'] ?></td>
 <td><a href="<?= e(url('profile.php?u=' . urlencode($x['username']))) ?>"><?= e($x['username']) ?></a></td>
-<td><?= e($x['email']) ?></td><td><?= (int)$x['pets'] ?></td>
+<td><?= e($x['email']) ?></td><td><?= (int)$x['pets'] ?></td><td><?= (int)$x['coins'] ?></td>
 <td><?= $x['is_admin'] ? '<span class="chip">Admin</span> ' : '' ?><?= $x['is_banned'] ? '<span class="chip bad">Gesperrt</span>' : '' ?></td>
 <td><form method="post" class="row wrap-r"><?= csrf_field() ?><input type="hidden" name="id" value="<?= $x['id'] ?>"><input type="hidden" name="q" value="<?= e($search) ?>">
   <?php if ($x['is_banned']): ?><button class="btn small ghost" name="do" value="unban">Entsperren</button><?php else: ?><button class="btn small ghost" name="do" value="ban">Sperren</button><?php endif; ?>
   <?php if ($x['is_admin']): ?><button class="btn small ghost" name="do" value="demote">Admin entziehen</button><?php else: ?><button class="btn small ghost" name="do" value="promote">Zum Admin</button><?php endif; ?>
+  <input name="coins" type="number" placeholder="± Münzen" class="mini"><button class="btn small ghost" name="do" value="coins">Geben</button>
   <input name="password" type="password" placeholder="Neues Passwort" class="mini"><button class="btn small ghost" name="do" value="password">Setzen</button>
   <button class="btn small danger" name="do" value="delete" onclick="return confirm('Benutzer und alle Tiere endgültig löschen?')">Löschen</button>
 </form></td></tr>

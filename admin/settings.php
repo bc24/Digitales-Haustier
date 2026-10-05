@@ -5,6 +5,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $vals = [
         'site_name' => mb_substr(trim($_POST['site_name'] ?? '') ?: 'Digitales Haustier', 0, 60),
         'max_pets' => (string)max(1, min(50, (int)($_POST['max_pets'] ?? 5))),
+        'coin_multiplier' => (string)max(0.1, min(10, (float)($_POST['coin_multiplier'] ?? 1))),
+        'minigame_daily_cap' => (string)max(0, min(10000, (int)($_POST['minigame_daily_cap'] ?? 200))),
         'site_url' => rtrim(mb_substr(trim($_POST['site_url'] ?? ''), 0, 200), '/'),
         'mail_from' => filter_var(trim($_POST['mail_from'] ?? ''), FILTER_VALIDATE_EMAIL) ?: '',
         'registration_open' => isset($_POST['registration_open']) ? '1' : '0',
@@ -22,6 +24,8 @@ admin_header('Einstellungen', 'settings');
   <label>Pause zwischen Spieltreffen (Min.)<input type="number" name="playdate_cooldown_min" min="0" max="1440" value="<?= e(setting('playdate_cooldown_min', '30')) ?>"></label>
   <label>Absolute Seiten-URL (für E-Mail-Links, z. B. https://haustier.example.de)<input name="site_url" value="<?= e(setting('site_url')) ?>"></label>
   <label>Absender-E-Mail für Systemmails<input type="email" name="mail_from" value="<?= e(setting('mail_from')) ?>"></label>
+  <label>Münz-Multiplikator (z. B. 2 für ein Doppel-Münzen-Event)<input type="number" step="0.1" min="0.1" max="10" name="coin_multiplier" value="<?= e(setting('coin_multiplier', '1')) ?>"></label>
+  <label>Minispiel-Münzlimit pro Tag<input type="number" name="minigame_daily_cap" min="0" value="<?= e(setting('minigame_daily_cap', '200')) ?>"></label>
   <label class="check"><input type="checkbox" name="registration_open" <?= setting('registration_open', '1') === '1' ? 'checked' : '' ?>> Registrierung offen</label>
   <button class="btn">Speichern</button></form></div>
 <?php page_footer();

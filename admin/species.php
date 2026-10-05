@@ -14,12 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mb_substr(trim($_POST['favorite_food'] ?? ''), 0, 40), max(0, min(100, (int)($_POST['base_affection'] ?? 30))),
             max(0, min(20, (float)($_POST['food_decay'] ?? 4))), max(0, min(20, (float)($_POST['fun_decay'] ?? 3))),
             max(0, min(20, (float)($_POST['clean_decay'] ?? 2))), max(0, min(20, (float)($_POST['energy_decay'] ?? 3))), isset($_POST['active']) ? 1 : 0,
+            in_array($_POST['rarity'] ?? '', array_keys(RARITY), true) ? $_POST['rarity'] : 'common', max(0, min(100000, (int)($_POST['price'] ?? 100))),
         ];
         if ($f[0] === '' || $f[1] === '') flash('Name und Emoji sind Pflicht.', 'err');
         else {
             try {
-                if ($id) { q('UPDATE species SET name=?, emoji=?, description=?, temperament=?, color=?, favorite_food=?, base_affection=?, food_decay=?, fun_decay=?, clean_decay=?, energy_decay=?, active=? WHERE id=?', [...$f, $id]); }
-                else { q('INSERT INTO species (name, emoji, description, temperament, color, favorite_food, base_affection, food_decay, fun_decay, clean_decay, energy_decay, active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', $f); }
+                if ($id) { q('UPDATE species SET name=?, emoji=?, description=?, temperament=?, color=?, favorite_food=?, base_affection=?, food_decay=?, fun_decay=?, clean_decay=?, energy_decay=?, active=?, rarity=?, price=? WHERE id=?', [...$f, $id]); }
+                else { q('INSERT INTO species (name, emoji, description, temperament, color, favorite_food, base_affection, food_decay, fun_decay, clean_decay, energy_decay, active, rarity, price) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', $f); }
                 flash('Gespeichert.');
             } catch (PDOException $ex) { flash('Speichern fehlgeschlagen (Name bereits vergeben?).', 'err'); }
         }
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('admin/species.php');
 }
 $list = rows('SELECT s.*, (SELECT COUNT(*) FROM pets WHERE species_id=s.id) AS pets FROM species s ORDER BY id');
-$blank = ['id' => 0, 'name' => '', 'emoji' => '', 'description' => '', 'temperament' => 'Ausgeglichen', 'color' => '#ffd6e0', 'favorite_food' => 'Leckerli', 'base_affection' => 30, 'food_decay' => 4, 'fun_decay' => 3, 'clean_decay' => 2, 'energy_decay' => 3, 'active' => 1, 'pets' => 0];
+$blank = ['id' => 0, 'name' => '', 'emoji' => '', 'description' => '', 'temperament' => 'Ausgeglichen', 'color' => '#ffd6e0', 'favorite_food' => 'Leckerli', 'base_affection' => 30, 'food_decay' => 4, 'fun_decay' => 3, 'clean_decay' => 2, 'energy_decay' => 3, 'active' => 1, 'pets' => 0, 'rarity' => 'common', 'price' => 100];
 admin_header('Arten', 'species');
 echo '<p class="muted">Anfangszuneigung: Wie sehr das Tier einen neuen Besitzer mag (niedrig = misstrauisch). Verfall: Punkte pro Stunde.</p>';
 foreach (array_merge([$blank], $list) as $s): ?>
@@ -44,6 +45,8 @@ foreach (array_merge([$blank], $list) as $s): ?>
     <label>Schmutz/Std<input type="number" step="0.1" name="clean_decay" value="<?= e($s['clean_decay']) ?>"></label>
     <label>Müdigkeit/Std<input type="number" step="0.1" name="energy_decay" value="<?= e($s['energy_decay']) ?>"></label>
   </div>
+  <div class="two"><label>Seltenheit<select name="rarity"><?php foreach (RARITY as $rk => $rl): ?><option value="<?= $rk ?>" <?= $s['rarity'] === $rk ? 'selected' : '' ?>><?= e($rl) ?></option><?php endforeach; ?></select></label>
+    <label>Adoptionspreis (nur gewöhnliche Arten)<input type="number" name="price" min="0" value="<?= (int)$s['price'] ?>"></label></div>
   <label class="check"><input type="checkbox" name="active" <?= $s['active'] ? 'checked' : '' ?>> Aktiv (adoptierbar)</label>
   <div class="row"><button class="btn small" name="do" value="save">Speichern</button>
   <?php if ($s['id']): ?><button class="btn small danger" name="do" value="delete" onclick="return confirm('Art löschen?')">Löschen</button><?php endif; ?></div>

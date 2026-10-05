@@ -23,6 +23,9 @@ if (!is_file(ROOT . '/config.local.php') && basename($_SERVER['SCRIPT_NAME']) !=
 }
 if (is_file(ROOT . '/config.local.php')) {
     require __DIR__ . '/db.php';
+    require __DIR__ . '/migrate.php';
+    migrate($pdo);
+    require __DIR__ . '/economy.php';
     require __DIR__ . '/game.php';
     require __DIR__ . '/layout.php';
 }

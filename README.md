@@ -8,6 +8,23 @@ Tamagotchi-artiges Haustier-Spiel in PHP (8.1+) und MySQL/MariaDB.
 3. `install.php` danach löschen. Der Admin-Bereich liegt unter `/admin/`.
 
 ## Funktionen
+**Spielschleife**
+- Pflege (füttern, spielen, streicheln, waschen, pflegen, schlafen) bringt Münzen, XP und Zuneigung (mit Tageslimit)
+- Spielerlevel mit Level-Up-Bonus, Tier-Entwicklungsstufen (Baby, Jungtier, Erwachsen, Meister)
+- Tagesbonus mit Serie (Streak, Wochentruhe, Streak-Schutz), tägliches Glücksrad, 3 Tagesquests plus Tagestruhe, 16 Erfolge
+- Shop: Futter und Pflege, Kopfschmuck, Zimmer, Eier, Spezial; Rucksack
+- Eier mit Brutzeit: Seltenheit (gewöhnlich bis legendär) und seltene Schillerfarben; seltene Arten gibt es nur aus Eiern
+- 3 Minispiele (Leckerli-Fänger, Tier-Memory, Tier-Tipp) mit serverseitiger Prüfung, Tageslimit für Münzen und Wochen-Highscores
+- Arena (Trophäen), Freundschaftsduelle, Ranglisten (alle / nur Freunde)
+
+**Mit Freunden**
+- Freunde, Online-Status, Pinnwand, tägliche Geschenke, Besuche (Tiere streicheln), Eier wärmen, Spieltreffen, Duelle
+
+**Technik**
+- Datenbank-Migrationen laufen automatisch (`migrations/`), bestehende Installationen werden beim ersten Aufruf aktualisiert
+- Admin: Münz-Multiplikator für Events, Minispiel-Limit, Shop-Items, Arten mit Seltenheit und Preis, Münzen vergeben
+
+**Basis**
 - 12 Tierarten, Füttern, Spielen, Streicheln, Waschen, Pflegen, Schlafen; Werte sinken über die Zeit
 - Zuneigung: misstrauische Arten weichen anfangs aus, mit Pflege und Futter mögen sie dich
 - Öffentliche Profile, Freundschaftssystem (Anfrage, Annahme, Entfernen)

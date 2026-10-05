@@ -25,6 +25,7 @@ function current_user(): ?array {
         if (!empty($_SESSION['uid'])) {
             $user = row('SELECT * FROM users WHERE id = ?', [$_SESSION['uid']]);
             if (!$user || $user['is_banned']) { $user = null; unset($_SESSION['uid']); }
+            elseif (!$user['last_seen'] || time() - strtotime($user['last_seen']) > 60) q('UPDATE users SET last_seen = NOW() WHERE id = ?', [$user['id']]);
         }
     }
     return $user;
