@@ -2,7 +2,8 @@
 require __DIR__ . '/inc/bootstrap.php';
 $done = is_file(ROOT . '/config.local.php');
 $err = '';
-$v = ['host' => 'localhost', 'name' => 'haustier', 'user' => 'root', 'admin' => 'admin', 'email' => ''];
+$manualCfg = null;
+$v =['host' => 'localhost', 'name' => 'haustier', 'user' => 'root', 'admin' => 'admin', 'email' => ''];
 
 if (!$done && $_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($v as $k => $_) $v[$k] = trim($_POST[$k] ?? '');
@@ -21,11 +22,13 @@ if (!$done && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (trim($stmt) !== '') $pdo->exec($stmt);
             }
             $pdo->exec("INSERT INTO settings (k, v) VALUES ('schema_version', '1') ON DUPLICATE KEY UPDATE v = '1'");
-            $st = $pdo->prepare('INSERT INTO users (username, email, password_hash, display_name, is_admin, created_at) VALUES (?,?,?,?,1,NOW())');
+            // Bei erneutem Durchlauf (z. B. nach Schreibfehler) wird das Admin-Konto aktualisiert statt doppelt angelegt
+            $st = $pdo->prepare('INSERT INTO users (username, email, password_hash, display_name, is_admin, created_at) VALUES (?,?,?,?,1,NOW())
+                                 ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), is_admin = 1');
             $st->execute([$v['admin'], $v['email'], password_hash($apass, PASSWORD_DEFAULT), $v['admin']]);
             $cfg = "<?php\nreturn " . var_export(['host' => $v['host'], 'name' => $v['name'], 'user' => $v['user'], 'pass' => $dbpass], true) . ";\n";
-            if (file_put_contents(ROOT . '/config.local.php', $cfg) === false) throw new RuntimeException('config.local.php konnte nicht geschrieben werden.');
-            $done = true;
+            if (@file_put_contents(ROOT . '/config.local.php', $cfg) === false) $manualCfg = $cfg;
+            else $done = true;
         } catch (Throwable $ex) {
             $err = 'Fehler: ' . $ex->getMessage();
         }
@@ -41,6 +44,15 @@ if (!$done && $_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="flash ok">Installation abgeschlossen.</div>
   <p>Lösche aus Sicherheitsgründen die Datei <code>install.php</code> vom Server.</p>
   <a class="btn" href="<?= e(url('login.php')) ?>">Zur Anmeldung</a>
+<?php elseif ($manualCfg !== null): ?>
+  <div class="flash ok">Datenbank und Admin-Konto sind angelegt.</div>
+  <div class="flash err">Der Server darf im Hauptordner keine Datei anlegen. Erstelle die Datei bitte selbst:</div>
+  <ol>
+    <li>Lege im Hauptordner der Seite (neben <code>install.php</code>) eine neue Datei mit dem Namen <code>config.local.php</code> an.</li>
+    <li>Füge genau diesen Inhalt ein und speichere:</li>
+  </ol>
+  <textarea readonly rows="9" onclick="this.select()" style="font-family:monospace"><?= e($manualCfg) ?></textarea>
+  <p class="muted">Danach diese Seite neu laden. Lösche anschließend <code>install.php</code>. Alternativ gibst du dem Ordner Schreibrechte (CHMOD 775) und lädst die Seite neu, dann klickst du erneut auf Installieren.</p>
 <?php else: ?>
   <?php if ($err): ?><div class="flash err"><?= e($err) ?></div><?php endif; ?>
   <form method="post" class="form">
