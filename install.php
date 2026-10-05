@@ -11,7 +11,7 @@ if (!$done && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!preg_match('/^[A-Za-z0-9_]{3,30}$/', $v['admin'])) $err = 'Admin-Benutzername: 3-30 Zeichen (Buchstaben, Zahlen, _).';
     elseif (!filter_var($v['email'], FILTER_VALIDATE_EMAIL)) $err = 'Ungültige E-Mail.';
     elseif (strlen($apass) < 8) $err = 'Admin-Passwort: mindestens 8 Zeichen.';
-    elseif (!preg_match('/^[A-Za-z0-9_]+$/', $v['name'])) $err = 'Ungültiger Datenbankname.';
+    elseif (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $v['name'])) $err = 'Ungültiger Datenbankname.';
     else {
         try {
             $pdo = new PDO("mysql:host={$v['host']};charset=utf8mb4", $v['user'], $dbpass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
