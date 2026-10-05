@@ -28,7 +28,7 @@ page_header('Zuhause', 'dashboard');
 </div>
 
 <?php if ($requests): ?><div class="flash ok">Du hast <?= $requests ?> offene Freundschaftsanfrage(n). <a href="<?= e(url('friends.php')) ?>">Ansehen</a></div><?php endif; ?>
-<?php if ($eggsReady): ?><div class="flash ok">🥚 <?= $eggsReady ?> Ei(er) bereit zum Ausbrüten! <a href="<?= e(url('eggs.php')) ?>">Zum Brutkasten</a></div><?php endif; ?>
+<?php if ($eggsReady): ?><div class="flash ok">🏠 <?= $eggsReady ?> Tier(e) warten im Tierheim auf dich! <a href="<?= e(url('shelter.php')) ?>">Abholen</a></div><?php endif; ?>
 <?php if ($giftsWaiting): ?><div class="flash ok">🎁 <?= $giftsWaiting ?> Geschenk(e) von Freunden warten auf dich. <a href="<?= e(url('daily.php')) ?>">Abholen</a></div><?php endif; ?>
 <?php if ($claimable): ?><div class="flash ok">✅ <?= $claimable ?> Quest(s) erledigt, Belohnung wartet. <a href="<?= e(url('quests.php')) ?>">Abholen</a></div><?php endif; ?>
 <?php if ($needy): ?><div class="flash err">Manche Tiere brauchen dich: <?= e(implode(', ', array_map(fn($p) => $p['name'], $needy))) ?></div><?php endif; ?>
@@ -52,7 +52,7 @@ page_header('Zuhause', 'dashboard');
     <div class="actions">
       <a class="act" href="<?= e(url('games.php')) ?>">🎮 Minispiele</a>
       <a class="act" href="<?= e(url('arena.php')) ?>">🏟️ Arena</a>
-      <a class="act" href="<?= e(url('eggs.php')) ?>">🥚 Brutkasten<?= $eggsWait ? " ($eggsWait)" : '' ?></a>
+      <a class="act" href="<?= e(url('shelter.php')) ?>">🏠 Tierheim<?= $eggsWait ? " ($eggsWait)" : '' ?></a>
       <a class="act" href="<?= e(url('shop.php')) ?>">🛍️ Shop</a>
     </div>
     <?php if ($online): ?><h3 style="margin-top:16px">Freunde online</h3><div class="chips"><?php foreach ($online as $f): ?><a class="chip big" href="<?= e(url('profile.php?u=' . urlencode($f['username']))) ?>"><i class="online"></i><?= e($f['avatar'] . ' ' . ($f['display_name'] ?: $f['username'])) ?></a><?php endforeach; ?></div><?php endif; ?>

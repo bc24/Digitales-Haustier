@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $s = row("SELECT * FROM species WHERE id = ? AND active = 1 AND rarity = 'common'", [(int)($_POST['species'] ?? 0)]);
     $price = $first ? 0 : (int)($s['price'] ?? 0);
     if ($count >= $max) flash("Du kannst höchstens $max Tiere haben.", 'err');
-    elseif (!$s) flash('Bitte wähle ein adoptierbares Tier aus. Seltene Tiere schlüpfen aus Eiern.', 'err');
+    elseif (!$s) flash('Bitte wähle ein adoptierbares Tier aus. Seltene Tiere gibt es nur über das Tierheim.', 'err');
     elseif (mb_strlen($name) < 2 || mb_strlen($name) > 30) flash('Der Name muss 2-30 Zeichen lang sein.', 'err');
     elseif ($price > 0 && !spend($uid, $price)) flash('Nicht genug Münzen.', 'err');
     else {
@@ -25,7 +25,7 @@ $species = rows('SELECT * FROM species WHERE active = 1 ORDER BY FIELD(rarity,\'
 page_header('Tier adoptieren', 'adopt');
 ?>
 <h1>Tier adoptieren</h1>
-<p class="muted"><?= $first ? 'Dein erstes Tier ist kostenlos!' : 'Gewöhnliche Tiere kosten Münzen. Seltene, epische und legendäre Tiere schlüpfen aus Eiern (<a href="' . e(url('shop.php?tab=egg')) . '">Eier-Shop</a>).' ?></p>
+<p class="muted"><?= $first ? 'Dein erstes Tier ist kostenlos!' : 'Gewöhnliche Tiere kosten Münzen. Seltene, epische und legendäre Tiere vermittelt das <a href="' . e(url('shop.php?tab=egg')) . '">Tierheim</a> (Antrag stellen und warten).' ?></p>
 <?php if ($count >= $max): ?><div class="flash err">Du hast bereits die maximale Anzahl von <?= $max ?> Tieren. Eine <a href="<?= e(url('shop.php?tab=boost')) ?>">Stall-Erweiterung</a> schafft Platz.</div><?php else: ?>
 <form method="post" class="form-wide"><?= csrf_field() ?>
   <div class="grid pick">
@@ -36,7 +36,7 @@ page_header('Tier adoptieren', 'adopt');
       <h3><?= e($s['name']) ?></h3>
       <p class="muted"><?= e($s['description']) ?></p>
       <span class="chip"><?= e($s['temperament']) ?></span><?= rarity_chip($s['rarity']) ?>
-      <span class="chip"><?= $ok ? ($first ? 'Gratis' : '🪙 ' . (int)$s['price']) : 'Nur aus Eiern' ?></span>
+      <span class="chip"><?= $ok ? ($first ? 'Gratis' : '🪙 ' . (int)$s['price']) : 'Nur über Tierheim' ?></span>
     </label>
   <?php endforeach; ?>
   </div>

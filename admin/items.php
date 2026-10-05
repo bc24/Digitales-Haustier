@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/_inc.php';
-const KINDS = ['use' => 'Verbrauchsgegenstand', 'hat' => 'Kopfschmuck', 'room' => 'Zimmer', 'egg' => 'Ei', 'boost' => 'Spezial'];
+const KINDS = ['use' => 'Verbrauchsgegenstand', 'hat' => 'Kopfschmuck', 'room' => 'Zimmer', 'egg' => 'Tierheim-Antrag', 'boost' => 'Spezial'];
 const FX = ['food_val' => 'Sättigung', 'fun_val' => 'Spaß', 'clean_val' => 'Sauberkeit', 'energy_val' => 'Energie', 'health_val' => 'Gesundheit', 'aff_val' => 'Zuneigung'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_post();
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $list = rows('SELECT * FROM items ORDER BY kind, sort, id');
 $blank = ['id' => 0, 'kind' => 'use', 'name' => '', 'emoji' => '', 'description' => '', 'price' => 50, 'rarity' => 'common', 'color' => '#ffffff', 'food_val' => 0, 'fun_val' => 0, 'clean_val' => 0, 'energy_val' => 0, 'health_val' => 0, 'aff_val' => 0, 'hatch_minutes' => 0, 'weights' => '', 'active' => 1];
 admin_header('Shop-Items', 'items');
-echo '<p class="muted">Eier: Brutzeit in Minuten und Gewichte „gewöhnlich,selten,episch,legendär“ (z. B. 80,18,2,0). Zimmer: Farbe. Verbrauchsgegenstände: Effekte in Punkten. Die Namen „Streak-Schutz“, „Wärmelampe“, „Stall-Erweiterung“, „Apfel“, „Torte“, „Zauberkeks“, „Gourmet-Menü“ und „Standard-Ei“ werden vom Spiel referenziert, bitte nicht umbenennen.</p>';
+echo '<p class="muted">Tierheim-Anträge: Wartezeit in Minuten und Gewichte „gewöhnlich,selten,episch,legendär“ (z. B. 80,18,2,0). Zimmer: Farbe. Verbrauchsgegenstände: Effekte in Punkten. Die Namen „Streak-Schutz“, „Eilvermerk“, „Stall-Erweiterung“, „Apfel“, „Torte“, „Zauberkeks“, „Gourmet-Menü“ und „Tierheim-Antrag“ werden vom Spiel referenziert, bitte nicht umbenennen.</p>';
 foreach (array_merge([$blank], $list) as $it): ?>
 <details class="card" <?= $it['id'] ? '' : 'open' ?>><summary><?= $it['id'] ? e($it['emoji'] . ' ' . $it['name']) . ' <span class="muted">(' . e(KINDS[$it['kind']]) . ', ' . (int)$it['price'] . ' Münzen)' . ($it['active'] ? '' : ' - inaktiv') . '</span>' : '<b>Neues Item</b>' ?></summary>
 <form method="post" class="form"><?= csrf_field() ?><input type="hidden" name="id" value="<?= $it['id'] ?>">
@@ -37,7 +37,7 @@ foreach (array_merge([$blank], $list) as $it): ?>
     <label>Farbe (Zimmer)<input type="color" name="color" value="<?= e($it['color']) ?>"></label>
   </div>
   <div class="four"><?php foreach (FX as $c => $l): ?><label><?= e($l) ?><input type="number" name="<?= $c ?>" value="<?= (int)$it[$c] ?>"></label><?php endforeach; ?>
-    <label>Brutzeit (Min.)<input type="number" name="hatch_minutes" min="0" value="<?= (int)$it['hatch_minutes'] ?>"></label>
+    <label>Wartezeit (Min.)<input type="number" name="hatch_minutes" min="0" value="<?= (int)$it['hatch_minutes'] ?>"></label>
     <label>Gewichte<input name="weights" value="<?= e($it['weights']) ?>" placeholder="80,18,2,0"></label></div>
   <label class="check"><input type="checkbox" name="active" <?= $it['active'] ? 'checked' : '' ?>> Aktiv (im Shop sichtbar)</label>
   <div class="row"><button class="btn small">Speichern</button><?php if ($it['id']): ?><button class="btn small danger" name="do" value="delete" onclick="return confirm('Item löschen?')">Löschen</button><?php endif; ?></div>

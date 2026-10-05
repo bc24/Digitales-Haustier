@@ -12,13 +12,13 @@ Tamagotchi-artiges Haustier-Spiel in PHP (8.1+) und MySQL/MariaDB.
 - Pflege (füttern, spielen, streicheln, waschen, pflegen, schlafen) bringt Münzen, XP und Zuneigung (mit Tageslimit)
 - Spielerlevel mit Level-Up-Bonus, Tier-Entwicklungsstufen (Baby, Jungtier, Erwachsen, Meister)
 - Tagesbonus mit Serie (Streak, Wochentruhe, Streak-Schutz), tägliches Glücksrad, 3 Tagesquests plus Tagestruhe, 16 Erfolge
-- Shop: Futter und Pflege, Kopfschmuck, Zimmer, Eier, Spezial; Rucksack
-- Eier mit Brutzeit: Seltenheit (gewöhnlich bis legendär) und seltene Schillerfarben; seltene Arten gibt es nur aus Eiern
+- Shop: Futter und Pflege, Kopfschmuck, Zimmer, Tierheim-Anträge, Spezial; Rucksack
+- Tierheim: Vermittlungsanträge mit Wartezeit, Seltenheit (gewöhnlich bis legendär) und seltenen Schillerfarben; seltene Arten gibt es nur über das Tierheim
 - 3 Minispiele (Leckerli-Fänger, Tier-Memory, Tier-Tipp) mit serverseitiger Prüfung, Tageslimit für Münzen und Wochen-Highscores
 - Arena (Trophäen), Freundschaftsduelle, Ranglisten (alle / nur Freunde)
 
 **Mit Freunden**
-- Freunde, Online-Status, Pinnwand, tägliche Geschenke, Besuche (Tiere streicheln), Eier wärmen, Spieltreffen, Duelle
+- Freunde, Online-Status, Pinnwand, tägliche Geschenke, Besuche (Tiere streicheln), Fürsprache für Vermittlungen, Spieltreffen, Duelle
 
 **Technik**
 - Datenbank-Migrationen laufen automatisch (`migrations/`), bestehende Installationen werden beim ersten Aufruf aktualisiert

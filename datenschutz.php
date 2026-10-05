@@ -18,7 +18,7 @@ Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Nutzungsvertrag über die Teilnahme
 <h3>4. Öffentliches Profil und Spieldaten</h3>
 <p>Dein Profil ist öffentlich einsehbar, auch ohne Anmeldung. Sichtbar sind: Benutzername, Anzeigename, Avatar, Profiltext, Registrierungsdatum, deine Tiere (Name, Art, Level, Stimmung) und deine Freundesliste. Gib in Anzeigename und Profiltext keine Daten an, die du nicht öffentlich machen möchtest.<br>
 Zusätzlich sichtbar sind dein Spielerlevel, deine Trophäen, dein Login-Streak, freigeschaltete Erfolge, ein Online-Status (zuletzt aktiv in den letzten 5 Minuten) und Nachrichten auf deiner Pinnwand. Auf der Pinnwand können nur du und deine Freunde schreiben; du, der Verfasser und die Administration können Nachrichten löschen. Deinen Namen siehst du außerdem in den öffentlichen Ranglisten (Trophäen, Level, Streak, Minispiel-Wochenwerte).<br>
-Außerdem speichern wir Spieldaten: Zustand deiner Tiere, Münzen, Inventar, Brutkasten, Tagesaufgaben und Statistiken, Minispiel-Ergebnisse, Geschenke, Besuche, Freundschaftsanfragen und Freundschaften, Spieltreffen und Arena-Kämpfe der Tiere sowie einen Aktivitätsverlauf, den nur du in deinen Neuigkeiten siehst.<br>
+Außerdem speichern wir Spieldaten: Zustand deiner Tiere, Münzen, Inventar, Tierheim-Vermittlungen, Tagesaufgaben und Statistiken, Minispiel-Ergebnisse, Geschenke, Besuche, Freundschaftsanfragen und Freundschaften, Spieltreffen und Arena-Kämpfe der Tiere sowie einen Aktivitätsverlauf, den nur du in deinen Neuigkeiten siehst.<br>
 Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</p>
 
 <h3>5. Cookies</h3>

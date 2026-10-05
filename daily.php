@@ -5,7 +5,7 @@ $uid = (int)$u['id'];
 const WHEEL = [
     ['🪙 10 Münzen', 'coins', 10, 28], ['🪙 25 Münzen', 'coins', 25, 24], ['🪙 50 Münzen', 'coins', 50, 14], ['🪙 150 Münzen', 'coins', 150, 4],
     ['🍎 Apfel', 'item', 'Apfel', 10], ['🍰 Torte', 'item', 'Torte', 8], ['🍪 Zauberkeks', 'item', 'Zauberkeks', 6],
-    ['🛡️ Streak-Schutz', 'item', 'Streak-Schutz', 4], ['🥚 Standard-Ei', 'egg', 'Standard-Ei', 2],
+    ['🛡️ Streak-Schutz', 'item', 'Streak-Schutz', 4], ['📋 Tierheim-Antrag', 'egg', 'Tierheim-Antrag', 2],
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = "Tag $streak: +$coins Münzen.$note";
         if ($d === 7) {
             award($uid, 100, 30);
-            if (random_int(1, 100) <= 40 && (int)val('SELECT COUNT(*) FROM eggs WHERE user_id=?', [$uid]) < 3) { give_egg($uid, (int)item_by_name('Standard-Ei')['id']); $msg .= ' Wochentruhe: +100 Münzen und ein Ei!'; }
+            if (random_int(1, 100) <= 40 && (int)val('SELECT COUNT(*) FROM eggs WHERE user_id=?', [$uid]) < 3) { give_egg($uid, (int)item_by_name('Tierheim-Antrag')['id']); $msg .= ' Wochentruhe: +100 Münzen und ein Tierheim-Antrag!'; }
             else { add_item($uid, (int)item_by_name('Zauberkeks')['id']); $msg .= ' Wochentruhe: +100 Münzen und ein Zauberkeks!'; }
         }
         check_achievements($uid);
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif ($type === 'item') add_item($uid, (int)item_by_name($arg)['id']);
         else {
             if ((int)val('SELECT COUNT(*) FROM eggs WHERE user_id=?', [$uid]) < 3) give_egg($uid, (int)item_by_name($arg)['id']);
-            else { award($uid, 100); $label = '🪙 100 Münzen (Brutkasten voll)'; }
+            else { award($uid, 100); $label = '🪙 100 Münzen (Tierheim voll)'; }
         }
         $_SESSION['spin'] = $label;
         flash("Glücksrad: $label");
@@ -96,7 +96,7 @@ page_header('Tagesbonus', 'daily');
 <div class="two">
   <div class="card center"><h3>🎡 Tägliches Glücksrad</h3>
     <?php if (!empty($_SESSION['spin'])): ?><div class="spin"><?= e($_SESSION['spin']) ?></div><?php unset($_SESSION['spin']); endif; ?>
-    <p class="muted">Einmal pro Tag kostenlos drehen. Gewinne Münzen, Items oder ein Ei.</p>
+    <p class="muted">Einmal pro Tag kostenlos drehen. Gewinne Münzen, Items oder einen Vermittlungsantrag.</p>
     <form method="post"><?= csrf_field() ?><input type="hidden" name="do" value="spin"><button class="btn" <?= $spun ? 'disabled style="opacity:.5"' : '' ?>><?= $spun ? 'Heute schon gedreht' : 'Rad drehen' ?></button></form>
   </div>
   <div class="card"><h3>🎁 Geschenke von Freunden</h3>

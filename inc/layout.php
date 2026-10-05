@@ -33,7 +33,7 @@ function page_header(string $title, string $active = ''): void {
     <nav>
       <?php if ($u): ?>
         <a class="<?= $active === 'dashboard' ? 'on' : '' ?>" href="<?= e(url('dashboard.php')) ?>">Zuhause</a>
-        <?= nav_dd('Spielen', ['games.php' => 'Minispiele', 'arena.php' => 'Arena', 'playdate.php' => 'Spieltreffen', 'eggs.php' => 'Brutkasten'], $active) ?>
+        <?= nav_dd('Spielen', ['games.php' => 'Minispiele', 'arena.php' => 'Arena', 'playdate.php' => 'Spieltreffen', 'shelter.php' => 'Tierheim'], $active) ?>
         <?= nav_dd('Belohnungen', ['daily.php' => 'Tagesbonus & Rad', 'quests.php' => 'Quests & Erfolge'], $active, $dailyReady ? ' <i class="dot"></i>' : '') ?>
         <?= nav_dd('Shop', ['shop.php' => 'Shop', 'inventory.php' => 'Rucksack', 'adopt.php' => 'Tier adoptieren'], $active) ?>
         <?= nav_dd('Community', ['friends.php' => 'Freunde', 'leaderboard.php' => 'Ranglisten', 'users.php' => 'Spieler entdecken'], $active, $pending ? ' <em>' . $pending . '</em>' : '') ?>

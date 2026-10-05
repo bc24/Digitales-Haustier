@@ -1,4 +1,4 @@
-// Brutkasten-Countdowns
+// Tierheim-Countdowns
 (function () {
   function fmt(s) {
     if (s <= 0) return 'bereit';

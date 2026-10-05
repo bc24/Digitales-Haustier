@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif (q("INSERT IGNORE INTO daily (user_id, day, k, v) VALUES (?,CURDATE(),'chest',1)", [$uid])->rowCount() === 0) flash('Die Truhe hast du heute schon geöffnet.', 'err');
         else {
             $c = award($uid, 60, 20); $msg = "Tagestruhe: +$c Münzen";
-            if (random_int(1, 100) <= 25 && (int)val('SELECT COUNT(*) FROM eggs WHERE user_id=?', [$uid]) < 3) { give_egg($uid, (int)item_by_name('Standard-Ei')['id']); $msg .= ' und ein Ei!'; }
+            if (random_int(1, 100) <= 25 && (int)val('SELECT COUNT(*) FROM eggs WHERE user_id=?', [$uid]) < 3) { give_egg($uid, (int)item_by_name('Tierheim-Antrag')['id']); $msg .= ' und ein Tierheim-Antrag!'; }
             else { add_item($uid, (int)item_by_name('Gourmet-Menü')['id']); $msg .= ' und ein Gourmet-Menü!'; }
             flash($msg);
         }
